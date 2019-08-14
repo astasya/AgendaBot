@@ -1,0 +1,53 @@
+﻿Sandbox専用,-
+卓予定カレンダー,https://calendar.google.com/calendar/embed?src=qfb1anra3p8e96363mv4v98q5c%40group.calendar.google.com&ctz=Asia%2FTokyo,Sandboxの卓予定のカレンダーです。
+公式Twitterアカウント,https://twitter.com/TRPG_Sandbox,SandboxのTwitterアカウントです。
+ルルブ所持チェック回答,https://goo.gl/forms/768CgNJIEMfgl4103,Sandboxメンバーの所持するルルブを回答するアンケートです。
+ルルブ所持チェック表,https://docs.google.com/spreadsheets/d/1O-fgPvwmLrrJikvqK_uPRcQS9Hhezl4iRLbUJXXV2_c/edit#gid=1493110338,Sandboxメンバーの所持するルルブのアンケート結果です。
+マスタリング向上アンケート テンプレート,https://docs.google.com/forms/d/1-auzMD3C4eciWQ9IZ1JWQDSUdhPVHC2AwO5HtlOdqhA/edit,マスタリング向上の為に実施するアンケートのテンプレートです。
+SandboxBot ソースコード,https://github.com/astasya/AgendaBot,Sandboxで稼働するSandboxBotのソースコードです。
+TRPG全般,-
+キャラクターシート保管所,http://charasheet.vampire-blood.net/,Kurumi氏が開発したTRPGキャラクターシート作成補助ツールです。
+plig.dj,https://plug.dj/-7831612453679587670,Youtube、SoundCloudの動画・音声をリアルタイムで共有できるサイトです。
+TRPG 名前作成,http://www.elerl.com/elseeds/NameMaker/,ランダムで名前を生成するサイトです。
+TRPG PLの思考,https://hobbyjapan.co.jp/dd_old/news/dmg4th/dmg4th.html,TRPGのPLの思考に関するコラムです。
+TRPG MAP作成,-
+Dungeon Maps For RPG,http://pyromancers.com/dungeon-painter-online/,-
+Ye Olde Map Maker,http://www.yeoldemapmaker.com/editor/,-
+Medieval Fantasy City Generator,https://watabou.itch.io/medieval-fantasy-city-generator,-
+TRPG イラスト,-
+ニコニコモンズ,https://commons.nicovideo.jp/,-
+いらすとや,https://www.irasutoya.com/,-
+ゆるドラシル,http://yurudora.com/tkool/,スマートフォンRPG「ゆるドラシル」の素材が無料で公開されている公式サイトです。
+星宝転生ジェルセイバー,http://www.jewel-s.jp/,オンラインゲーム「星宝転生ジェルセイバー」の素材を無料で公開されている公式サイトです。
+どどんとふ,-
+どどんとふ,https://dodontof.onlinesession.app/,竹流氏が開発したTRPGオンラインセッションソフトです。
+どどんとふ API仕様,http://www.dodontof.com/DodontoF/README.html#whatIsWebIf,どどんとふの仕様です。
+ユドナリウム支援,-
+キャラクターコマ作成,https://yoshis-island.net/udonarium/#/charazip,ユドナリウムのキャラコマ作成補助ツールです。
+SW2.0/2.5,-
+SW2.0/2.5 公式,http://www.groupsne.co.jp/products/sw/index.html,グループSNEのSW2.0/2.5の公式サイトです。
+SW2.5 チャットパレット,https://drive.google.com/uc?export=download&id=1SwomCS8mBrJmI5H-gcMWlhY2WW76Nmps,わたぽん氏が作成したSW2.5チャットパレットです。
+SW2.5ユドナリウム用魔物データテンプレート,https://drive.google.com/uc?export=download&id=1eFPaHoq7e9dCVVSDx9c69RHgJ7YQeNs5,ヤリス氏が作成したSW2.5の魔物データテンプレートです。
+nariharatrpg@wiki,https://www65.atwiki.jp/nariharatrpg/,Sandboxで開催されたSW2.0/2.5のセッションまとめサイトです。
+ゆとしーとM SandBox(現在故障中),http://www.nari-monster.noob.jp/,Noni氏が管理するSandboxのSW2.0/2.5のモンスターデータ共有サイトです。
+DX3rd,-
+DX3rd用チャットパレット,https://drive.google.com/uc?export=download&id=1GWi4KkTrsheN6BUPGQIBI9ggkiGGdnX5,DX3rd用チャットパレットです。
+DX3rd用カウンターリモコン,https://drive.google.com/uc?export=download&id=1yKsIlaAVBOU99T3aS8MNfBnwxXdLelbI,DX3rd用カウンターリモコンです。
+CoC,-
+ナイアルオブパラダイス(同人サプリ)公式,http://nyaranarchism.sakura.ne.jp/paradise/archive/,-
+ナイアルオブパラダイス キャラシ作成ルール,http://nyaranarchism.sakura.ne.jp/paradise/images/player.pdf,-
+獸ノ森,-
+獸ノ森 非公式索引,https://twitter.com/ALima_F_/status/1106904858592862209?s=20,ALima_F_氏が作成した獸ノ森 非公式索引です。
+永い後日談のネクロニカ,-
+どどんとふ用保存データ,http://4d4l.net/dodontof-nekuronika-savedata/,青りんご氏が作成したネクロニカのどどんとふ用保存データです。
+サタスペ,-
+サタスペ用チャットパレット,https://drive.google.com/uc?export=download&id=17Rkd9T57CxMizFXOsrean1cbt0aFaocn,サタスペ用チャットパレットです。
+鋼鉄のユグドラシル,-
+鋼鉄のユグドラシル 公式,http://ygg.sakura.ne.jp/,SATORU氏が作成したTRPG「鋼鉄のユグドラシル」の公式サイトです。
+鋼鉄のユグドラシル どどんとふ,http://experimental.sakura.ne.jp/DodontoF/,ドクトル氏が管理するどどんとふです。
+百鬼歴程,-
+百鬼歴程 公式,http://seesaawiki.jp/norawankotrpg/d/%a5%c8%a5%c3%a5%d7%a5%da%a1%bc%a5%b8,野良わんこ氏が作成したTRPG「百鬼歴程」の公式サイトです。
+どどんとふ用保存データ,https://drive.google.com/uc?export=download&id=1FxA1btThfBHnp9VP1vTU4G78XqU69nI2,ヤリス氏が作成した百鬼歴程のどどんとふ用保存データです。
+Eireann,-
+Eireann 公式,http://clogfiddle.at-ninja.jp/eireann3rd/eireann3rd000.htm,侍トナカイ氏が作成したTRPG「Eireann」の公式サイトです。
+Eireann キャラクターシート,https://drive.google.com/uc?export=download&id=1ynRrb6libZHmJjCane5hl8-hL3c9Wl-t,アロエの黒さんが作成した「Eireann」のキャラクターシートです。
