@@ -124,6 +124,7 @@ credentials.json
 *.csv
 *.zip
 *.db
+*.png
 
 # Heroku
 Procfile

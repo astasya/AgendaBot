@@ -11,13 +11,16 @@
 #
 ################################################################
 # Python標準ライブラリ
-import datetime             # 時間を扱うモジュール
-import os                   # ファイルを扱うモジュール  
-import re                   # 正規表現モジュール  
-import sqlite3              # DBを扱うモジュール
+import datetime                     # 時間を扱うモジュール
+import os                           # ファイルを扱うモジュール  
+import re                           # 正規表現モジュール  
+import sqlite3                      # DBを扱うモジュール
 
 # 有志制作のライブラリ
-import discord              # discord用APIラッパー   ver1.0.1
+import discord                      # discord用APIラッパー   ver1.0.1
+import matplotlib                   # グラフ描画用モジュール
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
 ################################################################
 #
@@ -27,6 +30,10 @@ import discord              # discord用APIラッパー   ver1.0.1
 # DBのファイル名
 DB_MES_FILEPATH = './mes.db'
 DB_VC_FILEPATH  = './vc.db'
+
+# グラフのファイル名
+PNG_MES_FILEPATH = './mes.png'
+PNG_VC_FILEPATH  = './vc.png'
 
 ################################################################
 #
@@ -73,8 +80,7 @@ class Alog:
     async def test_for_vc(self):
         query = 'SELECT * FROM vc'
         for row in self.vc_cur.execute(query):
-            print(row)
-        
+            print(row)        
     
     ############################################################
     # 処理内容：起動時処理
@@ -126,6 +132,10 @@ class Alog:
         # ヘルプコマンド
         if re.match('\$alog_help', message.content):
             await self.alog_help(message)
+            
+        # 解析コマンド
+        if re.match('\$alog_analy', message.content):
+            await self.alog_analyzation(message)
         
         # DB取得コマンド
         if re.match('\$alog_download', message.content):
@@ -141,6 +151,7 @@ class Alog:
     async def alog_help(self, message):
         # ヘルプメッセージ
         HELP_MSG =['``` ### Sandbox鯖 アクセスログ解析機能 ###',
+                   '$alog_analy 本コマンドを入力した日時の直近1週間のTextチャンネルへの投稿数及びVCチャンネルへの接続時間数をグラフで表示します。',
                    '$alog_download Textチャンネル及びVCチャンネルへの全アクセスログを取得する。(鯖管理者専用)',
                    '```',]
 
@@ -155,6 +166,29 @@ class Alog:
         # 実行結果をテキストチャンネルに送信
         await message.channel.send(send_ms)
 
+    ############################################################
+    # 処理内容：解析処理
+    # 関数名　：alog_analyzation
+    # 引数　　：self     / メソッドの仮引数
+    # 　　　　：message  / メッセージ構造体
+    # 戻り値　：なし
+    ############################################################
+    async def alog_analyzation(self, message):
+        # 現在時刻の取得
+        time = self.generate_now_time()
+        
+        # グラフの生成
+        self.graph_db_for_mes(time)
+        self.graph_db_for_vc(time)
+        
+        # グラフの生成結果を画面に表示
+        await message.channel.send('',
+                                   file=discord.File(PNG_MES_FILEPATH)
+                                  )
+        await message.channel.send('',
+                                   file=discord.File(PNG_VC_FILEPATH)
+                                  )
+        
     ############################################################
     # 処理内容：DBダウンロード処理
     # 関数名　：alog_db_download
@@ -199,8 +233,7 @@ class Alog:
     ############################################################    
     async def on_voice_state_update(self,member, before, after, AFK_CHANNEL_ID):
         # 現在時刻の取得
-        JST = datetime.timezone(datetime.timedelta(hours=+9), 'JST')
-        time = datetime.datetime.now(JST)
+        time = self.generate_now_time()
 
         # user_idの取得
         user_id = member.id
@@ -516,9 +549,208 @@ class Alog:
         # SQL文を条件式と結合
         query = f'{query} WHERE {conditions}'
 
-        print(query)
-        print(criteria)
-        
         # SQLの検索結果をListとして戻す
         return [row for row in self.vc_cur.execute(query, criteria)]
 
+    ############################################################
+    # 処理内容：VC接続時間管理用DB 検索処理
+    # 関数名　：graph_db_for_mes
+    # 引数　　：self        / メソッドの仮引数
+    # 　　　　：time_now    / 現在時刻
+    # 戻り値　：なし
+    ############################################################
+    def graph_db_for_mes(self, time_now):
+        
+        # コマンド入力日のa.m.0を基準時刻とする
+        base_time = datetime.datetime(time_now.year,
+                                      time_now.month,
+                                      time_now.day,
+                                      0,
+                                      0,
+                                      0)
+
+        # X軸の初期化
+        x_axis = [] # データの検索に使うX軸(N日の6時)
+        x_plot = [] # グラフの表示に使うX軸(N日の0時)
+        x_lim  = [] # グラフの軸(N)
+
+        # 1week分for文を回す
+        for i in range(7):
+            # 基準時刻から7日前の日付を1日づつ順に取得
+            time = base_time + datetime.timedelta(days = i - 7, hours = 6)
+            x_axis.append(time)
+            
+            time = base_time + datetime.timedelta(days = i - 7)
+            x_plot.append(time)
+            
+            x_lim.append(time.day)
+
+        # y軸の初期化 (各日と各日を6hで分割したときの投稿数をそれぞれ格納する)
+        y_axis  = [] # 全データ
+        y_6_12  = [] # 6～12時
+        y_12_18 = [] # 12~18時
+        y_18_24 = [] # 18~24時
+        y_24_6  = [] # 24~6時
+        
+        # x軸の値分for文を回す
+        for x in x_axis:
+            # データ数の初期化
+            count = 0
+            
+            # 1日を6hで分割して集計するため、4回for文を回す
+            for i in range (4):
+                # 検索結果を取得
+                ret = self.select_db_for_mes(start_time = x + datetime.timedelta(hours = 6 * i),
+                                            end_time   = x + datetime.timedelta(hours = 6 * (i + 1)))
+                # 投稿数を取得
+                if   i == 0:
+                    y_6_12.append(len(ret))
+                elif i == 1:
+                    y_12_18.append(len(ret))
+                elif i == 2:
+                    y_18_24.append(len(ret))
+                elif i == 3:
+                    y_24_6.append(len(ret))
+
+                # 投稿数を合計
+                count += len(ret)
+
+            # 1日分の投稿数を取得
+            y_axis.append(count)
+
+        # グラフの準備
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        
+        # データのプロット
+        ax.plot(x_plot,y_axis,  label='All Day')
+        ax.plot(x_plot,y_6_12,  label='hour 06 - 12')
+        ax.plot(x_plot,y_12_18, label='hour 12 - 18')
+        ax.plot(x_plot,y_18_24, label='hour 18 - 24')
+        ax.plot(x_plot,y_24_6,  label='hour 24 - 06')
+        
+        # 軸設定
+        ax.set_xlabel('days [-]')
+        ax.set_ylabel('messages [-]')
+        # X軸は日にちのみを表示
+        ax.set_xticklabels(x_lim)
+        # Y軸は整数値のみを表示
+        ax.get_yaxis().set_major_locator(ticker.MaxNLocator(integer=True))
+
+        # 凡例を追加
+        # legend and title
+        ax.legend(loc='best')
+        ax.set_title('Number of Messages in 1 week')
+        
+        # グラフを画像化して保存
+        plt.savefig(PNG_MES_FILEPATH)
+
+    ############################################################
+    # 処理内容：VC接続時間管理用DB 検索処理
+    # 関数名　：graph_db_for_vc
+    # 引数　　：self        / メソッドの仮引数
+    # 　　　　：time_now    / 現在時刻
+    # 戻り値　：なし
+    ############################################################
+    def graph_db_for_vc(self, time_now):
+        # コマンド入力日のa.m.0を基準時刻とする
+        base_time = datetime.datetime(time_now.year,
+                                      time_now.month,
+                                      time_now.day,
+                                      0,
+                                      0,
+                                      0)
+
+        # X軸の初期化
+        x_axis = [] # データの検索に使うX軸(N日の6時)
+        x_plot = [] # グラフの表示に使うX軸(N日の0時)
+        x_lim  = [] # グラフの軸(N)
+
+        # 1week分for文を回す
+        for i in range(7):
+            # 基準時刻から7日前の日付を1日づつ順に取得
+            time = base_time + datetime.timedelta(days = i - 7, hours = 6)
+            x_axis.append(time)
+            
+            time = base_time + datetime.timedelta(days = i - 7)
+            x_plot.append(time)
+            
+            x_lim.append(time.day)
+
+        # y軸の初期化 (各日と各日を6hで分割したときの投稿数をそれぞれ格納する)
+        y_axis  = [] # 全データ
+        y_6_12  = [] # 6～12時
+        y_12_18 = [] # 12~18時
+        y_18_24 = [] # 18~24時
+        y_24_6  = [] # 24~6時
+        
+        # x軸の値分for文を回す
+        for x in x_axis:
+            # データ数の初期化
+            count = 0
+            
+            # 1日を6hで分割して集計するため、4回for文を回す
+            for i in range (4):
+                # 検索結果を取得
+                start_time = x + datetime.timedelta(hours = 6 * i)
+                end_time   = x + datetime.timedelta(hours = 6 * (i + 1))
+                ret = self.select_db_for_vc(start_time = start_time,
+                                            end_time   = end_time
+                                           )
+                
+                # 接続時間の初期化
+                connecting_time = 0
+                
+                for row in ret:
+                    time = row[3].split('.')
+                    connect_time    = datetime.datetime.strptime(time[0], '%Y-%m-%d %H:%M:%S')
+                    time = row[4].split('.')
+                    disconnect_time = datetime.datetime.strptime(time[0], '%Y-%m-%d %H:%M:%S')
+                    
+                    if connect_time < start_time:
+                        connect_time = start_time
+                    if disconnect_time > end_time:
+                        disconnect_time = end_time
+                    
+                    connecting_time += (disconnect_time - connect_time).total_seconds()/60/60
+                
+                # 投稿数を取得
+                if   i == 0:
+                    y_6_12.append(connecting_time)
+                elif i == 1:
+                    y_12_18.append(connecting_time)
+                elif i == 2:
+                    y_18_24.append(connecting_time)
+                elif i == 3:
+                    y_24_6.append(connecting_time)
+
+                # 投稿数を合計
+                count += connecting_time
+
+            # 1日分の投稿数を取得
+            y_axis.append(count)
+
+        # グラフの準備
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        
+        # データのプロット
+        ax.plot(x_plot,y_axis,  label='All Day')
+        ax.plot(x_plot,y_6_12,  label='hour 06 - 12')
+        ax.plot(x_plot,y_12_18, label='hour 12 - 18')
+        ax.plot(x_plot,y_18_24, label='hour 18 - 24')
+        ax.plot(x_plot,y_24_6,  label='hour 24 - 06')
+        
+        # 軸設定
+        ax.set_xlabel('days [-]')
+        ax.set_ylabel('times [h]')
+        # X軸は日にちのみを表示
+        ax.set_xticklabels(x_lim)
+
+        # 凡例を追加
+        # legend and title
+        ax.legend(loc='best')
+        ax.set_title('Talking times in 1 week')
+        
+        # グラフを画像化して保存
+        plt.savefig(PNG_VC_FILEPATH)
