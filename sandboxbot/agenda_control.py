@@ -838,7 +838,7 @@ class AgendaControl:
 
         # 単発卓のリストを出力
         for event_data in self.__single_session_list:
-            messageUrl = f"{url_begin}{serverId}/{CH_AGENDA}/{event_data['メッセージID']}"
+            messageUrl = f"{url_begin}{serverId}/{CH_AGENDA.id}/{event_data['メッセージID']}"
             message_row = f"{event_data['開始日時'].strftime('%Y/%m/%d %H:%M')}～ " \
                           f"[{event_data['GM名']}卓" \
                           f"{event_data['システム']}]({messageUrl}) " \
@@ -852,7 +852,7 @@ class AgendaControl:
             
         # キャンペーン卓のリストを出力
         for event_data in self.__campain_session_list:
-            messageUrl = f"{url_begin}{serverId}/{CH_AGENDA}/{event_data['メッセージID']}"
+            messageUrl = f"{url_begin}{serverId}/{CH_AGENDA.id}/{event_data['メッセージID']}"
             message_row = f"[{event_data['GM名']}卓" \
                           f"{event_data['システム']}]({messageUrl}) " \
                           f"{event_data['参加人数']} / "\
@@ -865,7 +865,7 @@ class AgendaControl:
 
         # 常時卓のリストを出力
         for event_data in self.__allways_session_list:
-            messageUrl = f"{url_begin}{serverId}/{CH_AGENDA}/{event_data['メッセージID']}"
+            messageUrl = f"{url_begin}{serverId}/{CH_AGENDA.id}/{event_data['メッセージID']}"
             message_row = f"[{event_data['GM名']}卓" \
                           f"{event_data['システム']}]({messageUrl}) " \
                           f"{event_data['参加人数']} / "\

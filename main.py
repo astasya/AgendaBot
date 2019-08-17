@@ -35,12 +35,19 @@ from sandboxbot import *    # 自作パッケージディレクトリ(./sandboxb
 bot_options = read_bot_param.get_bot_options('./bot_options.json')
 
 # JSONファイルから取得した情報を各変数に格納
-TOKEN      = bot_options["token"]       # BOTのトークン
-SERVER_ID  = bot_options["server_id"]   # Discordの鯖ID
-CH_GENERAL = bot_options["ch_general"]  # 雑談用CHのID(#雑談)
-CH_AGENDA  = bot_options["ch_agenda" ]  # TRPGセッション管理用CHのID(#agenda)
-CH_BOT     = bot_options["ch_bot"    ]  # Bot用CHのID(#dicebot)
-CH_ADMIN   = bot_options["ch_admin"  ]  # 管理者専用CHのID(#staff)
+TOKEN        = bot_options["token"]             # BOTのトークン
+SERVER_ID    = bot_options["server_id"]         # Discordの鯖ID
+CH_GENERAL   = bot_options["ch_general"]        # 雑談用CHのID(#雑談)
+CH_AGENDA    = bot_options["ch_agenda" ]        # TRPGセッション管理用CHのID(#agenda)
+CH_BOT       = bot_options["ch_bot"    ]        # Bot用CHのID(#dicebot)
+CH_ADMIN     = bot_options["ch_admin"  ]        # 管理者専用CHのID(#staff)
+
+CAT_GENERAL  = bot_options["cat_general"]       # 雑談を行うVCのカテゴリ
+CAT_SESSION  = bot_options["cat_session"]       # TRPGセッションを行うVCのカテゴリ
+CAT_OTHER    = bot_options["cat_other"]         # ゲーム全般を行うVCのカテゴリ
+
+ROLE_ADMIN   = bot_options["role_admin"]        # サーバの管理者の役職
+ROLE_STAFF   = bot_options["role_staff"]        # サーバの管理権限保有者の役職
 
 ################################################################
 #
@@ -60,7 +67,7 @@ if __name__ == '__main__': # 直接実行モジュールの指定
     # サーバマネジメント系
     agenda  = agenda_control.AgendaControl()    # TRPGセッション管理機能
     link    = useful_link.UsefulLink()          # 便利サイト紹介
-    # alog    = access_log.ALog()                # アクセスログ解析機能
+    alog    = access_log.Alog()                 # アクセスログ解析機能
 
     # TRPG系
     dice    = dice_bot.DiceBot()                # ダイスを振る機能
@@ -89,10 +96,12 @@ if __name__ == '__main__': # 直接実行モジュールの指定
         if re.match('\$help', message.content):
             # ヘルプメッセージ
             # 詳細なヘルプは各モジュールを参照させるようにする。
-            HELP_MSG = ['``` ### Sandbox鯖の便利機能 ###',
+            HELP_MSG = ['``` ### Sandbox鯖 便利機能 ###',
                         '$list 卓の予定の一覧を#chatに表示する。',
                         '$useful_link 便利なサイトの一覧を出力する。',
-                        #'$logs VoiceChatのアクセスログ及びサーバータイムを表示する。',
+                        '```',
+                        '``` ### Sandbox鯖 アクセスログ解析機能 ###',
+                        '$alog_help Textチャンネル及びVCチャンネルへのアクセスログ解析機能についてのヘルプを表示する。',
                         '```',
                         '``` ### TRPGを遊ぶ ###',
                         '$dice_help ダイスを振る機能についてのヘルプを表示する。',
@@ -142,13 +151,17 @@ if __name__ == '__main__': # 直接実行モジュールの指定
         # Bot起動後、呼び出すスレッドを以下に記述
         #
         ########################################################
+        # アクセスログ解析機能 Bot再起動時処理
+        await alog.alog_on_ready(client.get_guild(SERVER_ID))
+
+        # TRPGセッション管理機能 日付変更時処理
         asyncio.ensure_future(agenda.date_change(SERVER_ID,
                                                  client.get_channel(CH_AGENDA),
                                                  client.get_channel(CH_GENERAL)
                                                 )
                              )
-
-        # メモ : asyncioは同時に実行している処理を妨げないスレッド処理です。
+            # メモ : asyncioは同時に実行している処理を妨げないスレッド処理です。
+        
         ######### Bot起動後、呼び出すスレッドの記述 ここまで #########
 
     ############################################################
@@ -175,7 +188,7 @@ if __name__ == '__main__': # 直接実行モジュールの指定
                                          client.get_channel(CH_BOT)
                                          )
         ### アクセスログ解析機能
-        #await alog.alog_on_message(message)
+        await alog.alog_on_message(message, [ROLE_ADMIN, ROLE_STAFF])
             
         # TRPG系
         ### ダイスを振る機能
@@ -258,5 +271,26 @@ if __name__ == '__main__': # 直接実行モジュールの指定
                                                reaction,
                                                client.get_channel(CH_AGENDA)
                                               )
+
+    ############################################################
+    # 処理内容：VoiceChatIN/OUT時の処理
+    # 関数名　：on_voice_state_update
+    # 引数　　：reaction / リアクションオブジェクト
+    #        : user / ユーザーオブジェクト
+    # 戻り値　：なし
+    ############################################################    
+    @client.event
+    async def on_voice_state_update(member, before, after):
+        # アクセスログ解析機能
+        guild = client.get_guild(SERVER_ID)
+        afk_channel_id = None
+        for row in guild.voice_channels:
+            if str(row.name) == str(guild.afk_channel):
+                afk_channel_id = row.id
+        await alog.on_voice_state_update(member,
+                                         before,
+                                         after,
+                                         afk_channel_id
+                                        )
 
     client.run(TOKEN) # bot実行、discord鯖への接続
