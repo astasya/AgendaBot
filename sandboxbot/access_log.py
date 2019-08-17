@@ -18,7 +18,7 @@ import sqlite3                      # DBを扱うモジュール
 
 # 有志制作のライブラリ
 import discord                      # discord用APIラッパー   ver1.0.1
-import matplotlib                   # グラフ描画用モジュール
+import matplotlib                   # グラフ描画用モジュール   ver3.1.1
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
