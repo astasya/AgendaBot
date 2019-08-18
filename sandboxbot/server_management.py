@@ -44,11 +44,12 @@ class Mgmt:
     ############################################################
     # 処理内容：message投稿時
     # 関数名　：alog_on_message
-    # 引数　　：self        / メソッドの仮引数
-    # 　　　　：message     / メッセージクラス
+    # 引数　　：self     / メソッドの仮引数
+    # 　　　　：guild    / ギルドクラス
+    # 　　　　：message  / メッセージクラス
     # 戻り値　：なし
     ############################################################
-    async def mgmt_on_message(self, message):
+    async def mgmt_on_message(self, guild, message):
         
         if isinstance(message.channel, discord.DMChannel):
             # botへのDM送信時、処理を終了する
@@ -68,13 +69,13 @@ class Mgmt:
         
         # 対象者の鯖加入日検索
         if re.match('\$mgmt_id', message.content):
-            await self.mgmt_join_date(message)
+            await self.mgmt_join_date(guild, message)
 
     ############################################################
     # 処理内容：help表示
     # 関数名　：mgmt_help
     # 引数　　：self     / メソッドの仮引数
-    #        : message / メッセージ構造体
+    # 　　　　：message  / メッセージクラス
     # 戻り値　：なし
     ############################################################
     async def mgmt_help(self, message):
@@ -99,7 +100,7 @@ class Mgmt:
     # 処理内容：サーバのユーザ総数取得
     # 関数名　：mgmt_members
     # 引数　　：self     / メソッドの仮引数
-    # 　　　　：message  / メッセージ構造体
+    # 　　　　：message  / メッセージクラス
     # 戻り値　：なし
     ############################################################
     async def mgmt_members(self, message):
@@ -115,18 +116,33 @@ class Mgmt:
         
     ############################################################
     # 処理内容：解析処理
-    # 関数名　：alog_analyzation
+    # 関数名　：mgmt_join_date
     # 引数　　：self     / メソッドの仮引数
-    # 　　　　：message  / メッセージ構造体
+    # 　　　　：guild    / ギルドクラス
+    # 　　　　：message  / メッセージクラス
     # 戻り値　：なし
     ############################################################
-    async def mgmt_join_date(self, message):
-        # ユーザ名の取得
-        name = message.author.nick
-        if name == None:
-            name = message.author.name
-
-        # 加入日の取得
-        date = (message.author.joined_at).strftime('%Y/%m/%d %H:%M')
+    async def mgmt_join_date(self, guild, message):
+        # 送信メッセージの初期化
+        send_ms = None
         
-        await message.channel.send(f'{name}さんのSandbox加入日時は{date}です。')
+        # idの取得
+        user_id = int( ((message.content).split("_"))[2] )
+        
+        # memberの取得
+        member = guild.get_member(user_id)
+        
+        if member == None:
+            # member取得失敗時、エラーを返す
+            send_ms = 'エラー：IDを確認してください。'
+            
+        else:
+            # member取得成功時、加入日時をを返す
+            date = (member.joined_at).strftime('%Y/%m/%d %H:%M')
+            name = member.nick
+            if name == None:
+                name = member.name
+
+            send_ms = f'{name}さんのSandbox加入日時は{date}です。'
+
+        await message.channel.send(send_ms)

@@ -192,7 +192,7 @@ if __name__ == '__main__': # 直接実行モジュールの指定
                                          client.get_channel(CH_BOT)
                                          )
         ### サーバ管理補助機能
-        await mgmt.mgmt_on_message(message)
+        await mgmt.mgmt_on_message(client.get_guild(SERVER_ID), message)
 
         ### アクセスログ解析機能
         await alog.alog_on_message(message, [ROLE_ADMIN, ROLE_STAFF])
