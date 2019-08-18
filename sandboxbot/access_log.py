@@ -126,6 +126,10 @@ class Alog:
             # botへのDM送信時、処理を終了する
             return
 
+        if(message.author.bot):
+            # メッセージの投稿者がBotの場合、処理を終了する
+            return
+
         # 投稿回数カウント
         self.insert_db_for_mes(message.author.id,
                                message.channel.id)

@@ -68,6 +68,7 @@ if __name__ == '__main__': # 直接実行モジュールの指定
     agenda  = agenda_control.AgendaControl()    # TRPGセッション管理機能
     link    = useful_link.UsefulLink()          # 便利サイト紹介
     alog    = access_log.Alog()                 # アクセスログ解析機能
+    mgmt    = server_management.Mgmt()          # サーバ管理機能
 
     # TRPG系
     dice    = dice_bot.DiceBot()                # ダイスを振る機能
@@ -96,11 +97,14 @@ if __name__ == '__main__': # 直接実行モジュールの指定
         if re.match('\$help', message.content):
             # ヘルプメッセージ
             # 詳細なヘルプは各モジュールを参照させるようにする。
-            HELP_MSG = ['``` ### Sandbox鯖 便利機能 ###',
+            HELP_MSG = ['``` ### 便利機能 ###',
                         '$list 卓の予定の一覧を#chatに表示する。',
                         '$useful_link 便利なサイトの一覧を出力する。',
                         '```',
-                        '``` ### Sandbox鯖 アクセスログ解析機能 ###',
+                        '``` ### サーバ管理補助機能 ###',
+                        '$mgmt_help Sandbox管理用の補助機能のヘルプを表示する。',
+                        '```',
+                        '``` ### アクセスログ解析機能 ###',
                         '$alog_help Textチャンネル及びVCチャンネルへのアクセスログ解析機能についてのヘルプを表示する。',
                         '```',
                         '``` ### TRPGを遊ぶ ###',
@@ -187,6 +191,9 @@ if __name__ == '__main__': # 直接実行モジュールの指定
         await link.usefullink_on_message(message,
                                          client.get_channel(CH_BOT)
                                          )
+        ### サーバ管理補助機能
+        await mgmt.mgmt_on_message(message)
+
         ### アクセスログ解析機能
         await alog.alog_on_message(message, [ROLE_ADMIN, ROLE_STAFF])
             
